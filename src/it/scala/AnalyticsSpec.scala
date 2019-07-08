@@ -15,10 +15,10 @@ class AnalyticsSpec extends FlatSpec with Matchers {
   def result (httpResponses: HttpResponse*) :List[String] = {
     httpResponses.map {
       httpResponse =>
-        val c = httpResponse.getEntity.getContent
-        val b = Array.ofDim[Byte](c.available())
-        c.read(b)
-        new String(b)
+        val content = httpResponse.getEntity.getContent
+        val bytes = Array.ofDim[Byte](content.available())
+        content.read(bytes)
+        new String(bytes)
     }.toList
   }
 }
