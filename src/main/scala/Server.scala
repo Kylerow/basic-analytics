@@ -5,7 +5,10 @@ class Server extends HttpApp{
   override def routes: Route =
     path("analytics") {
       get {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Hello, World."))
+        parameter("timestamp".as[String]){
+          timestamp =>
+            complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, getStatisticsForTimestamp(timestamp.toLong)))
+        }
       } ~
       post {
         complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Hello, World."))
