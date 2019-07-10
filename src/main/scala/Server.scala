@@ -2,6 +2,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{HttpApp, Route}
 
 class Server extends HttpApp{
+  val eventStorage = new EventStorage()
   override def routes: Route =
     path("analytics") {
       get {
@@ -11,7 +12,11 @@ class Server extends HttpApp{
         }
       } ~
       post {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Hello, World."))
+        parameters('timestamp.as[String], 'user.as[String], 'event.as[String]) {
+          (timestamp, user, event) =>
+            eventStorage.saveEvent(Event(timestamp.toLong,user.toLong, EventType(event)))
+            complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
+        }
       }
     }
 }

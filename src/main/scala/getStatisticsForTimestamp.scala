@@ -1,7 +1,17 @@
+import org.joda.time.{DateTime, DateTimeZone}
+
 object getStatisticsForTimestamp {
+  var eventStorage :EventStorage = null
+
+  def getEventStorage()={
+    if (eventStorage==null)
+      eventStorage = new EventStorage
+    eventStorage
+  }
+
   def apply(timestamp: Long) :String = {
-    """unique_users,1
-      |clicks,15
-      |impressions,145"""
+    val eventStorage = getEventStorage()
+    val statistic = eventStorage.getStatistic(new DateTime(timestamp,DateTimeZone.UTC))
+    eventStorage.asCsv(statistic)
   }
 }

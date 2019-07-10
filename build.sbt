@@ -15,5 +15,6 @@ lazy val root = (project in file("."))
     libraryDependencies += "com.typesafe.akka" %% "akka-http"   % "10.1.1",
     libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.11",
     libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.5" % "it,test",
-    libraryDependencies += "joda-time" % "joda-time" % "2.10.3"
+    libraryDependencies += "joda-time" % "joda-time" % "2.10.3",
+    libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % Test
   )

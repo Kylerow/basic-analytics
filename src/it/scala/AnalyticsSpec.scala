@@ -8,7 +8,7 @@ class AnalyticsSpec extends FlatSpec with Matchers {
 
   "An event" should "be created a unique user if none exists" in {
     val timestamp = 1
-    val user = "bob"
+    val user = "5"
     val event = "click"
 
     val hour = AnalyticsTiming.getHour
@@ -17,6 +17,20 @@ class AnalyticsSpec extends FlatSpec with Matchers {
 
     hour shouldBe AnalyticsTiming.getHour
     resultValue.split('\n')(0).split(',')(1) shouldBe "1"
+  }
+  it should "create increment to two unique users if one exists" in  {
+    val timestamp = 1
+    val user = "5"
+    val user2 = "72"
+    val event = "click"
+
+    val hour = AnalyticsTiming.getHour
+    httpclient.execute(postUri(timestamp,user,event))
+    httpclient.execute(postUri(timestamp,user2,event))
+    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
+
+    hour shouldBe AnalyticsTiming.getHour
+    resultValue.split('\n')(0).split(',')(1) shouldBe "2"
   }
   it should "not create a unique user for the current hour if it's outside the current hour" in {
     1 shouldBe 1
