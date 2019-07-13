@@ -1,10 +1,26 @@
+import akka.http.scaladsl.Http.ServerBinding
 import org.apache.http.HttpResponse
+import akka.http.scaladsl.Http.ServerBinding
 import org.apache.http.client.methods.{HttpGet, HttpPost, HttpPut, HttpUriRequest}
 import org.apache.http.impl.client.HttpClients
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
-class AnalyticsSpec extends FlatSpec with Matchers{
-  
+import scala.concurrent.Future
+
+class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+  val embeddedServer =
+    System.getProperty("analytics.server.embedded") match {
+      case booleanString: String => booleanString.toBoolean
+      case _ => false
+    }
+  var binding: Future[ServerBinding] = null;
+
+  override def beforeAll() =
+    if(embeddedServer) binding = ServerStarter.asyncStart
+
+  override def afterAll() =
+    if (embeddedServer) ServerStarter.asyncStop(binding)
+
   "An event" should "increment unique users from 0 to 1" in {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
@@ -21,7 +37,7 @@ class AnalyticsSpec extends FlatSpec with Matchers{
     resultValue.split('\n')(0).split(',')(1) shouldBe "1"
     httpclient.close()
   }
-  it should "create increment to two unique users if one exists" in  {
+  it should "increment to two unique users if one exists" in  {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
 
@@ -39,9 +55,7 @@ class AnalyticsSpec extends FlatSpec with Matchers{
     resultValue.split('\n')(0).split(',')(1) shouldBe "2"
     httpclient.close()
   }
-//  it should "not create a unique user for the current hour if it's outside the current hour" in {
-//    1 shouldBe 1
-//  }
+
   it should "not increment unique user, if the user is not unique" in  {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
@@ -96,16 +110,19 @@ class AnalyticsSpec extends FlatSpec with Matchers{
     httpclient.close()
   }
 
-  /// TODO validate return codes
-
   /// TODO only get stats for current hour
 
   /// TODO after current hour, start with long term - which don't disappear
+
+
 
   /// TODO validation for POST
   ///       * error for unknown event
 
   /// TODO validation for GET
+  ///       * correct data types
+
+  /// TODO validate return codes
 
   /// TODO unique users,clicks,impressions go from short term to long term
 
