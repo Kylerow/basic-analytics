@@ -21,16 +21,34 @@ case class Statistic(uniqueUsers: Option[Long], clicks: Option[Long], impression
 case class Event(timestamp: Long, userId: Long, eventType: EventType)
 
 object EventStorage{
-  val statistics = mutable.Map[String,Long]()
+  var statistics = mutable.Map[String,Long]()
+  var users = mutable.Set[Long]()
+  def clear() = {
+    statistics = mutable.Map[String,Long]()
+    users = mutable.Set[Long]()
+  }
 }
 
 class EventStorage {
-
-  val users = mutable.Set[Long]()
   def saveEvent(event: Event) = {
     event match {
-      case Event(timestamp, userid, _) => {
-        if(users.add(userid)) EventStorage.statistics.put("uniqueUsers",users.size)
+      case Event(timestamp, userid, EventType.CLICK) => {
+        val clicks =
+          EventStorage
+            .statistics
+            .getOrElse[Long]("clicks",0)
+        EventStorage.statistics.put("clicks",clicks+1)
+        if(EventStorage.users.add(userid))
+          EventStorage.statistics.put("uniqueUsers",EventStorage.users.size)
+      }
+      case Event(timestamp, userid, EventType.IMPRESSION) => {
+        val impressions =
+          EventStorage
+            .statistics
+            .getOrElse[Long]("impressions",0)
+        EventStorage.statistics.put("impressions",impressions+1)
+        if(EventStorage.users.add(userid))
+          EventStorage.statistics.put("uniqueUsers",EventStorage.users.size)
       }
     }
   }

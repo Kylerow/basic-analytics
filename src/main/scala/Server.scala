@@ -18,6 +18,12 @@ class Server extends HttpApp{
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
         }
       }
+    } ~
+    path("clear-cache"){
+      put{
+        EventStorage.clear()
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
+      }
     }
 }
 
