@@ -31,26 +31,17 @@ object EventStorage{
 
 class EventStorage {
   def saveEvent(event: Event) = {
-    event match {
-      case Event(timestamp, userid, EventType.CLICK) => {
-        val clicks =
-          EventStorage
-            .statistics
-            .getOrElse[Long]("clicks",0)
-        EventStorage.statistics.put("clicks",clicks+1)
-        if(EventStorage.users.add(userid))
-          EventStorage.statistics.put("uniqueUsers",EventStorage.users.size)
-      }
-      case Event(timestamp, userid, EventType.IMPRESSION) => {
-        val impressions =
-          EventStorage
-            .statistics
-            .getOrElse[Long]("impressions",0)
-        EventStorage.statistics.put("impressions",impressions+1)
-        if(EventStorage.users.add(userid))
-          EventStorage.statistics.put("uniqueUsers",EventStorage.users.size)
-      }
+    val storageName = event match {
+      case Event(_, _, EventType.CLICK) => "clicks"
+      case Event(_, _, EventType.IMPRESSION) => "impressions"
     }
+    val events =
+      EventStorage
+        .statistics
+        .getOrElse[Long](storageName,0)
+    EventStorage.statistics.put(storageName,events+1)
+    if(EventStorage.users.add(event.userId))
+      EventStorage.statistics.put("uniqueUsers",EventStorage.users.size)
   }
   def getStatistic(dateTime: DateTime) :Statistic = {
     Statistic(
