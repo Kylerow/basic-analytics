@@ -1,8 +1,8 @@
-import akka.http.scaladsl.Http.ServerBinding
 import org.apache.http.HttpResponse
 import akka.http.scaladsl.Http.ServerBinding
 import org.apache.http.client.methods.{HttpGet, HttpPost, HttpPut, HttpUriRequest}
 import org.apache.http.impl.client.HttpClients
+import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 import scala.concurrent.Future
@@ -25,7 +25,7 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
 
-    val timestamp = 1
+    val timestamp = DateTime.now(DateTimeZone.UTC).getMillis
     val user = "5"
     val event = "click"
 
@@ -41,7 +41,7 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
 
-    val timestamp = 1
+    val timestamp = DateTime.now(DateTimeZone.UTC).getMillis
     val user = "5"
     val user2 = "72"
     val event = "click"
@@ -60,7 +60,7 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
 
-    val timestamp = 1
+    val timestamp = DateTime.now(DateTimeZone.UTC).getMillis
     val user = "5"
     val user2 = "5"
     val event = "click"
@@ -79,7 +79,7 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
 
-    val timestamp = 1
+    val timestamp = DateTime.now(DateTimeZone.UTC).getMillis
     val user = "5"
     val event = "click"
 
@@ -96,7 +96,7 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val httpclient = HttpClients.createDefault
     httpclient.execute(clearCacheUri)
 
-    val timestamp = 1
+    val timestamp = DateTime.now(DateTimeZone.UTC).getMillis
     val user = "5"
     val event = "impression"
 
@@ -126,13 +126,13 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   /// TODO unique users,clicks,impressions go from short term to long term
 
-  def postUri(timestamp: Int, user: String, event: String) =
+  def postUri(timestamp: Long, user: String, event: String) =
     new HttpPost( s"http://localhost:8080/analytics?" +
       s"timestamp=${timestamp}&" +
       s"user=${user}&" +
       s"event=${event}")
 
-  def getUri(timestamp: Int): HttpUriRequest =
+  def getUri(timestamp: Long): HttpUriRequest =
     new HttpGet(s"http://localhost:8080/analytics?" +
       s"timestamp=${timestamp}")
 

@@ -24,7 +24,7 @@ class Server extends HttpApp{
         }
       }
     } ~
-    path("clear-cache"){
+    path("admin/clear-cache"){
       put{
         EventStorage.clear()
         complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
