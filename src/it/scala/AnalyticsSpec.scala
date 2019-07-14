@@ -111,27 +111,30 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "not increment the current hour stat, if entered for previous hour" in {
-//    val httpclient = HttpClients.createDefault
-//    httpclient.execute(clearCacheUri)
-//
-//    val timestamp = (DateTime.now(DateTimeZone.UTC).getMillis) - (1000*60*60)
-//    val user = "5"
-//    val event = "impression"
-//
-//    val hour = AnalyticsTiming.getHour
-//    httpclient.execute(postUri(timestamp,user,event))
-//    httpclient.execute(postUri(timestamp+1,user,event))
-//    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
-//
-//    hour shouldBe AnalyticsTiming.getHour
-//    resultValue.split('\n')(2).split(',')(1) shouldBe "0"
-//    httpclient.close()
+    val httpclient = HttpClients.createDefault
+    httpclient.execute(clearCacheUri)
+
+    val timestamp = (DateTime.now(DateTimeZone.UTC).getMillis) - (1000*60*60)
+    val user = "5"
+    val event = "impression"
+
+    val hour = AnalyticsTiming.getHour
+    httpclient.execute(postUri(timestamp,user,event))
+    httpclient.execute(postUri(timestamp+1,user,event))
+    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
+
+    hour shouldBe AnalyticsTiming.getHour
+    resultValue.split('\n')(2).split(',')(1) shouldBe "0"
+    httpclient.close()
+  }
+
+  /// TODO things that roll out of the current hour
+  it should "not affect the current statistics once the hour changes" in {
     1 shouldBe 1
   }
 
+
   /// TODO after current hour, start with long term - which don't disappear
-
-
 
   /// TODO validation for POST
   ///       * error for unknown event

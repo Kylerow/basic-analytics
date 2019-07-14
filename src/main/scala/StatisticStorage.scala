@@ -31,24 +31,32 @@ object EventStorage{
 
 class EventStorage {
   def saveEvent(event: Event) = {
-    val storageName = event match {
-      case Event(_, _, EventType.CLICK) => "clicks"
-      case Event(_, _, EventType.IMPRESSION) => "impressions"
+    val storageName = storageBucketName(event)
+
+    if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
+      val events =
+        EventStorage
+          .statistics
+          .getOrElse[Long](storageName, 0)
+      EventStorage.statistics.put(storageName, events + 1)
+
+      if (EventStorage.users.add(event.userId))
+        EventStorage.statistics.put("uniqueUsers", EventStorage.users.size)
     }
-    val events =
-      EventStorage
-        .statistics
-        .getOrElse[Long](storageName,0)
-    EventStorage.statistics.put(storageName,events+1)
-    if(EventStorage.users.add(event.userId))
-      EventStorage.statistics.put("uniqueUsers",EventStorage.users.size)
   }
+
+  val storageBucketName: Event=>String = {
+    case Event(_, _, EventType.CLICK) => "clicks"
+    case Event(_, _, EventType.IMPRESSION) => "impressions"
+  }
+
   def getStatistic(dateTime: DateTime) :Statistic = {
     Statistic(
       EventStorage.statistics.get("uniqueUsers"),
       EventStorage.statistics.get("clicks"),
       EventStorage.statistics.get("impressions"))
   }
+
   def asCsv(statistic: Statistic) :String = {
     s"""unique_users,${statistic.uniqueUsers.getOrElse(0)}
        |clicks,${statistic.clicks.getOrElse(0)}
