@@ -1,12 +1,22 @@
 import org.joda.time.DateTime
 
 object AnalyticsTiming {
-  def getHour() ={
+  var getHour = ()=>{
     val now = DateTime.now
-    (now.year(),now.dayOfYear(),now.hourOfDay())
+    (now.year().get(),now.dayOfYear().get(),now.hourOfDay().get())
   }
+
   def isCurrentHour(timestamp: Long) = {
     val comparisonDate = new DateTime(timestamp)
-    (comparisonDate.year(),comparisonDate.dayOfYear(),comparisonDate.hourOfDay()) == getHour()
+    (comparisonDate.year().get(),
+      comparisonDate.dayOfYear().get(),
+      comparisonDate.hourOfDay().get()) == getHour()
+  }
+
+  def setHourToPresentPlusOne() = {
+    getHour = ()=>{
+      val now = DateTime.now
+      (now.year().get(),now.dayOfYear().get(),now.hourOfDay().get()+1)
+    }
   }
 }

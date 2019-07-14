@@ -1,5 +1,3 @@
-import java.util
-
 import EventType.EventType
 import org.joda.time.DateTime
 
@@ -23,6 +21,7 @@ case class Event(timestamp: Long, userId: Long, eventType: EventType)
 object EventStorage{
   var statistics = mutable.Map[String,Long]()
   var users = mutable.Set[Long]()
+  var currentHour :(Int,Int,Int) = AnalyticsTiming.getHour()
   def clear() = {
     statistics = mutable.Map[String,Long]()
     users = mutable.Set[Long]()
@@ -32,6 +31,8 @@ object EventStorage{
 class EventStorage {
   def saveEvent(event: Event) = {
     val storageName = storageBucketName(event)
+
+    maintainCacheAlignment()
 
     if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
       val events =
@@ -45,12 +46,9 @@ class EventStorage {
     }
   }
 
-  val storageBucketName: Event=>String = {
-    case Event(_, _, EventType.CLICK) => "clicks"
-    case Event(_, _, EventType.IMPRESSION) => "impressions"
-  }
-
   def getStatistic(dateTime: DateTime) :Statistic = {
+    maintainCacheAlignment()
+
     Statistic(
       EventStorage.statistics.get("uniqueUsers"),
       EventStorage.statistics.get("clicks"),
@@ -62,5 +60,17 @@ class EventStorage {
        |clicks,${statistic.clicks.getOrElse(0)}
        |impressions,${statistic.impressions.getOrElse(0)}
     """.stripMargin
+  }
+
+  def maintainCacheAlignment() = {
+    if (EventStorage.currentHour!=AnalyticsTiming.getHour()){
+      EventStorage.clear()
+      EventStorage.currentHour = AnalyticsTiming.getHour()
+    }
+  }
+
+  val storageBucketName: Event=>String = {
+    case Event(_, _, EventType.CLICK) => "clicks"
+    case Event(_, _, EventType.IMPRESSION) => "impressions"
   }
 }

@@ -128,9 +128,25 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     httpclient.close()
   }
 
-  /// TODO things that roll out of the current hour
   it should "not affect the current statistics once the hour changes" in {
-    1 shouldBe 1
+    val httpclient = HttpClients.createDefault
+    httpclient.execute(clearCacheUri)
+
+    val timestamp = DateTime.now(DateTimeZone.UTC).getMillis
+    val user = "5"
+    val event = "click"
+
+    val hour = AnalyticsTiming.getHour
+    httpclient.execute(postUri(timestamp,user,event))
+    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
+    hour shouldBe AnalyticsTiming.getHour
+    resultValue.split('\n')(0).split(',')(1) shouldBe "1"
+
+    httpclient.execute(hourPlusOneUri)
+
+    val resultValue2 = result(httpclient.execute(getUri(timestamp)))(0)
+    resultValue2.split('\n')(0).split(',')(1) shouldBe "0"
+    httpclient.close()
   }
 
 
@@ -141,10 +157,13 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   /// TODO validation for GET
   ///       * correct data types
+  ///       * only checking for this hour
 
   /// TODO validate return codes
 
   /// TODO unique users,clicks,impressions go from short term to long term
+
+  /// TODO multithread / scale
 
   def postUri(timestamp: Long, user: String, event: String) =
     new HttpPost( s"http://localhost:8080/analytics?" +
@@ -157,7 +176,10 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       s"timestamp=${timestamp}")
 
   def clearCacheUri: HttpUriRequest =
-    new HttpPut("http://localhost:8080/clear-cache")
+    new HttpPut("http://localhost:8080/admin/clear-cache")
+
+  def hourPlusOneUri: HttpUriRequest =
+    new HttpPut("http://localhost:8080/admin/hour-plus-one")
 
   def result (httpResponses: HttpResponse*) :List[String] = {
     httpResponses.map {
