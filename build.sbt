@@ -12,10 +12,11 @@ lazy val root = (project in file("."))
     Defaults.itSettings,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "it,test",
     libraryDependencies += "com.spotify" % "docker-client" % "8.11.2" % "it,test",
+    libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.5" % "it,test",
+    libraryDependencies += "org.mockito" % "mockito-core" % "3.0.0" % "it,test",
     libraryDependencies += "com.typesafe.akka" %% "akka-http"   % "10.1.1",
     libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.11",
-    libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.5" % "it,test",
     libraryDependencies += "joda-time" % "joda-time" % "2.10.3",
-    libraryDependencies += "org.mockito" % "mockito-core" % "3.0.0",
-    libraryDependencies += "com.h2database" % "h2" % "1.4.199"
+    libraryDependencies += "com.h2database" % "h2" % "1.4.199",
+    IntegrationTest / parallelExecution := false
   )
