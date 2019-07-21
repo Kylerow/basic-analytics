@@ -4,16 +4,18 @@ case class Statistic(uniqueUsers: Option[Long], clicks: Option[Long], impression
 
 class Statistics extends Dependencies {
   def updateStatisticsCache(event: Event) = {
-    val storageName = storageBucketName(event)
-    if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
-      val events =
-        statisticsStorage
-          .statistics
-          .getOrElse[Long](storageName, 0)
-      statisticsStorage.statistics.put(storageName, events + 1)
+    statisticsStorage.statistics.synchronized {
+      val storageName = storageBucketName(event)
+      if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
+        val events =
+          statisticsStorage
+            .statistics
+            .getOrElse[Long](storageName, 0)
+        statisticsStorage.statistics.put(storageName, events + 1)
 
-      if (statisticsStorage.users.add(event.userId))
-        statisticsStorage.statistics.put("uniqueUsers", statisticsStorage.users.size)
+        if (statisticsStorage.users.add(event.userId))
+          statisticsStorage.statistics.put("uniqueUsers", statisticsStorage.users.size)
+      }
     }
   }
 

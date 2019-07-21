@@ -93,9 +93,5 @@ class AnalyticsSpec extends AnalyticsIntegrationTest{
     httpclient.close()
   }
 
-
-  /// TODO multithread / scale
-
-  /// TODO long term accuracy
-
+  /// TODO scale
 }
