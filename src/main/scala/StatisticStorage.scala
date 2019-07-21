@@ -30,10 +30,12 @@ object EventStorage{
 
 class EventStorage {
   def saveEvent(event: Event) = {
-    val storageName = storageBucketName(event)
-
     maintainCacheAlignment()
-
+    updateStatisticsCache(event)
+  }
+  
+  def updateStatisticsCache(event: Event) = {
+    val storageName = storageBucketName(event)
     if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
       val events =
         EventStorage
