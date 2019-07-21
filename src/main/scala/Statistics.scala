@@ -1,25 +1,36 @@
 import org.joda.time.DateTime
 
+import scala.collection.mutable
+
+object StatisticsStorage {
+  var statistics = mutable.Map[String,Long]()
+  var users = mutable.Set[Long]()
+  var currentHour :(Int,Int,Int) = AnalyticsTiming.getHour()
+  def clear() = {
+    statistics = mutable.Map[String,Long]()
+    users = mutable.Set[Long]()
+  }
+}
 case class Statistic(uniqueUsers: Option[Long], clicks: Option[Long], impressions: Option[Long])
 class Statistics {
   def updateStatisticsCache(event: Event) = {
     val storageName = storageBucketName(event)
     if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
       val events =
-        EventStorage
+        StatisticsStorage
           .statistics
           .getOrElse[Long](storageName, 0)
-      EventStorage.statistics.put(storageName, events + 1)
+      StatisticsStorage.statistics.put(storageName, events + 1)
 
-      if (EventStorage.users.add(event.userId))
-        EventStorage.statistics.put("uniqueUsers", EventStorage.users.size)
+      if (StatisticsStorage.users.add(event.userId))
+        StatisticsStorage.statistics.put("uniqueUsers", StatisticsStorage.users.size)
     }
   }
 
   def maintainCacheAlignment() = {
-    if (EventStorage.currentHour!=AnalyticsTiming.getHour()){
-      EventStorage.clear()
-      EventStorage.currentHour = AnalyticsTiming.getHour()
+    if (StatisticsStorage.currentHour!=AnalyticsTiming.getHour()){
+      StatisticsStorage.clear()
+      StatisticsStorage.currentHour = AnalyticsTiming.getHour()
     }
   }
 
@@ -27,9 +38,9 @@ class Statistics {
     maintainCacheAlignment()
 
     Statistic(
-      EventStorage.statistics.get("uniqueUsers"),
-      EventStorage.statistics.get("clicks"),
-      EventStorage.statistics.get("impressions"))
+      StatisticsStorage.statistics.get("uniqueUsers"),
+      StatisticsStorage.statistics.get("clicks"),
+      StatisticsStorage.statistics.get("impressions"))
   }
 
   def asCsv(statistic: Statistic) :String = {

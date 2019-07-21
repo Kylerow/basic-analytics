@@ -17,7 +17,6 @@ class EventPersistence {
   connection.close()
 
   def save(event: Event) = {
-    Class.forName("org.h2.Driver")
     val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
     try{
       val saveStatement = connection.prepareStatement(

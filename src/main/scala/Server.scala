@@ -26,7 +26,7 @@ class Server extends HttpApp with Dependencies{
     } ~
     path("admin" / "clear-cache"){
       put{
-        EventStorage.clear()
+        StatisticsStorage.clear()
         complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
       }
     } ~
