@@ -4,10 +4,10 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.stream.ActorMaterializer
+
 import scala.concurrent.Future
 
-class Server extends HttpApp{
-  val eventStorage = new EventStorage()
+class Server extends HttpApp with Dependencies{
   override def routes: Route =
     path("analytics") {
       get {

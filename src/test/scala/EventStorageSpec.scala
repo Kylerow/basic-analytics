@@ -1,5 +1,6 @@
 import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, Matchers}
+import org.mockito.Mockito._
 
 class EventStorageSpec  extends FlatSpec with Matchers {
   "event storage" should "return a statistic with one unique user" in {
@@ -11,15 +12,16 @@ class EventStorageSpec  extends FlatSpec with Matchers {
     result.uniqueUsers.get shouldBe 1
   }
   "save event" should "update cache and push to persistent storage" in {
-    // production code:
-    // 1) maintainCacheAlignment
-    // 2) update statistics cache
-    // 3) send to persistent storage
+    val mockStatistics = mock(classOf[Statistics])
+    val eventStorage = new EventStorage{
+      _statistics = mockStatistics
+    }
+    val event = Event(1,1,EventType.CLICK)
 
-    // steps to glorious success
-    // 1) partial mock the three tasks
-    // 2) call saveEvent
-    // 3) verify that the three methods are called
+    eventStorage.saveEvent(event)
+
+    verify(mockStatistics).maintainCacheAlignment()
+    verify(mockStatistics).updateStatisticsCache(event)
 
   }
 }

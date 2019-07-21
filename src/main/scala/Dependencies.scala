@@ -1,4 +1,5 @@
-class Dependencies {
+
+trait Dependencies {
   var _statistics :Statistics = null
   def statistics: Statistics = {
     if (_statistics==null) _statistics = new Statistics

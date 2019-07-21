@@ -1,7 +1,6 @@
-import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, Matchers}
 import org.mockito.Mockito._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 
 class getStatisticsForTimestampSpec extends FlatSpec with Matchers {
   "getStatisticsForTimestamp" should "convert cached stats into csv" in {
@@ -9,9 +8,7 @@ class getStatisticsForTimestampSpec extends FlatSpec with Matchers {
     val statistic = Statistic(Some(5),Some(100),Some(2000))
     when(
       mockStatistics
-        .getStatistic(
-          any(classOf[DateTime])
-        )
+        .getStatistic(any())
     ).thenReturn(statistic)
 
     when(

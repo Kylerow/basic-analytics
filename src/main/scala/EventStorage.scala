@@ -1,5 +1,4 @@
 import EventType.EventType
-import org.joda.time.DateTime
 
 import scala.collection.mutable
 
@@ -29,10 +28,8 @@ object EventStorage {
 }
 
 class EventStorage extends Dependencies {
-
   def saveEvent(event: Event) = {
     statistics.maintainCacheAlignment()
     statistics.updateStatisticsCache(event)
   }
-
 }
