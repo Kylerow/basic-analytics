@@ -5,23 +5,23 @@ import org.mockito.Matchers._
 
 class getStatisticsForTimestampSpec extends FlatSpec with Matchers {
   "getStatisticsForTimestamp" should "convert cached stats into csv" in {
-    val mockStatisticStorage = mock(classOf[EventStorage])
+    val mockStatistics = mock(classOf[Statistics])
     val statistic = Statistic(Some(5),Some(100),Some(2000))
     when(
-      mockStatisticStorage
+      mockStatistics
         .getStatistic(
           any(classOf[DateTime])
         )
     ).thenReturn(statistic)
 
     when(
-      mockStatisticStorage
+      mockStatistics
         .asCsv(
           statistic
         )
     ).thenReturn("it worked...")
 
-    getStatisticsForTimestamp.eventStorage = mockStatisticStorage
+    getStatisticsForTimestamp._statistics = mockStatistics
 
     val result = getStatisticsForTimestamp(1L)
     result shouldBe "it worked..."
