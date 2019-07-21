@@ -11,7 +11,7 @@ case class Event(timestamp: Long, userId: Long, eventType: EventType)
 
 class EventStorage extends Dependencies {
   def saveEvent(event: Event) = {
-    statistics.maintainCacheAlignment()
+    statisticsStorage.maintainCacheAlignment()
     statistics.updateStatisticsCache(event)
     eventPersistence.save(event)
   }

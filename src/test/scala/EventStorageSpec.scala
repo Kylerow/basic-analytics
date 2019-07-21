@@ -14,15 +14,17 @@ class EventStorageSpec  extends FlatSpec with Matchers {
   "save event" should "update cache and push to persistent storage" in {
     val mockStatistics = mock(classOf[Statistics])
     val mockEventPersistence = mock(classOf[EventPersistence])
+    val mockStatisticsStorage = mock(classOf[StatisticsStorage])
     val eventStorage = new EventStorage{
       _statistics = mockStatistics
+      _statisticsStorage = mockStatisticsStorage
       _eventPersistence = mockEventPersistence
     }
     val event = Event(1,1,EventType.CLICK)
 
     eventStorage.saveEvent(event)
 
-    verify(mockStatistics).maintainCacheAlignment()
+    verify(mockStatisticsStorage).maintainCacheAlignment()
     verify(mockStatistics).updateStatisticsCache(event)
     verify(mockEventPersistence).save(event)
   }

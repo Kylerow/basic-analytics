@@ -1,46 +1,32 @@
 import org.joda.time.DateTime
 
-import scala.collection.mutable
-
-object StatisticsStorage {
-  var statistics = mutable.Map[String,Long]()
-  var users = mutable.Set[Long]()
-  var currentHour :(Int,Int,Int) = AnalyticsTiming.getHour()
-  def clear() = {
-    statistics = mutable.Map[String,Long]()
-    users = mutable.Set[Long]()
-  }
-}
 case class Statistic(uniqueUsers: Option[Long], clicks: Option[Long], impressions: Option[Long])
-class Statistics {
+
+class Statistics extends Dependencies {
   def updateStatisticsCache(event: Event) = {
     val storageName = storageBucketName(event)
     if (AnalyticsTiming.isCurrentHour(event.timestamp)) {
       val events =
-        StatisticsStorage
+        statisticsStorage
           .statistics
           .getOrElse[Long](storageName, 0)
-      StatisticsStorage.statistics.put(storageName, events + 1)
+      statisticsStorage.statistics.put(storageName, events + 1)
 
-      if (StatisticsStorage.users.add(event.userId))
-        StatisticsStorage.statistics.put("uniqueUsers", StatisticsStorage.users.size)
-    }
-  }
-
-  def maintainCacheAlignment() = {
-    if (StatisticsStorage.currentHour!=AnalyticsTiming.getHour()){
-      StatisticsStorage.clear()
-      StatisticsStorage.currentHour = AnalyticsTiming.getHour()
+      if (statisticsStorage.users.add(event.userId))
+        statisticsStorage.statistics.put("uniqueUsers", statisticsStorage.users.size)
     }
   }
 
   def getStatistic(dateTime: DateTime) :Statistic = {
-    maintainCacheAlignment()
+    statisticsStorage.maintainCacheAlignment()
+    getCachedStatistic(dateTime)
+  }
 
+  def getCachedStatistic(dateTime: DateTime) :Statistic = {
     Statistic(
-      StatisticsStorage.statistics.get("uniqueUsers"),
-      StatisticsStorage.statistics.get("clicks"),
-      StatisticsStorage.statistics.get("impressions"))
+      statisticsStorage.statistics.get("uniqueUsers"),
+      statisticsStorage.statistics.get("clicks"),
+      statisticsStorage.statistics.get("impressions"))
   }
 
   def asCsv(statistic: Statistic) :String = {
