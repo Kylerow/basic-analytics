@@ -11,4 +11,10 @@ trait Dependencies {
     if (_eventStorage==null) _eventStorage = new EventStorage
     _eventStorage
   }
+
+  var _eventPersistence :EventPersistence = null
+  def eventPersistence = {
+    if (_eventPersistence==null) _eventPersistence = new EventPersistence
+    _eventPersistence
+  }
 }

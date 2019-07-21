@@ -4,16 +4,10 @@ import scala.collection.mutable
 
 object EventType extends Enumeration{
   type EventType = Value
-  def apply(eventType: String) = {
-    eventType match {
-      case "click" => CLICK
-      case "impression" => IMPRESSION
-      case _ => UNKNOWN
-    }
-  }
-  val CLICK, IMPRESSION, UNKNOWN = Value
+  val CLICK = Value("click")
+  val IMPRESSION = Value("impression")
+  val UNKNOWN = Value("unknown")
 }
-
 
 case class Event(timestamp: Long, userId: Long, eventType: EventType)
 
@@ -31,5 +25,6 @@ class EventStorage extends Dependencies {
   def saveEvent(event: Event) = {
     statistics.maintainCacheAlignment()
     statistics.updateStatisticsCache(event)
+    eventPersistence.save(event)
   }
 }

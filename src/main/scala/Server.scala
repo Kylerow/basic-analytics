@@ -19,7 +19,7 @@ class Server extends HttpApp with Dependencies{
       post {
         parameters('timestamp.as[String], 'user.as[String], 'event.as[String]) {
           (timestamp, user, event) =>
-            eventStorage.saveEvent(Event(timestamp.toLong,user.toLong, EventType(event)))
+            eventStorage.saveEvent(Event(timestamp.toLong,user.toLong, EventType.withName(event)))
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
         }
       }
