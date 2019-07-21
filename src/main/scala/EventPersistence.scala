@@ -1,5 +1,7 @@
 import java.sql.DriverManager
 
+import org.joda.time.DateTime
+
 class EventPersistence {
   Class.forName("org.h2.Driver")
   val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
@@ -30,5 +32,8 @@ class EventPersistence {
     }finally{
       connection.close()
     }
+  }
+  def loadHourlyStatistic(dateTime: DateTime) :(Option[Long],Option[Long],Option[Long]) = {
+    (Some(0L),Some(0),Some(0))
   }
 }

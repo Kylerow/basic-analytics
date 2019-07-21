@@ -18,11 +18,13 @@ class Statistics extends Dependencies {
   }
 
   def getStatistic(dateTime: DateTime) :Statistic = {
-    statisticsStorage.maintainCacheAlignment()
-    getCachedStatistic(dateTime)
+    if (AnalyticsTiming.isCurrentHour(dateTime))
+      getCachedStatistic(dateTime)
+    else Statistic.tupled(eventPersistence.loadHourlyStatistic(dateTime))
   }
 
   def getCachedStatistic(dateTime: DateTime) :Statistic = {
+    statisticsStorage.maintainCacheAlignment()
     Statistic(
       statisticsStorage.statistics.get("uniqueUsers"),
       statisticsStorage.statistics.get("clicks"),

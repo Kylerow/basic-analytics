@@ -12,7 +12,7 @@ trait Dependencies {
     if (_statistics==null) _statistics = new Statistics
     _statistics
   }
-  
+
   var _statisticsStorage :StatisticsStorage = null
   def statisticsStorage: StatisticsStorage = {
     if (_statisticsStorage==null) {

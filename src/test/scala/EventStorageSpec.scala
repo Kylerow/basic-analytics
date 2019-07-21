@@ -1,4 +1,4 @@
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatest.{FlatSpec, Matchers}
 import org.mockito.Mockito._
 
@@ -6,9 +6,9 @@ class EventStorageSpec  extends FlatSpec with Matchers {
   "event storage" should "return a statistic with one unique user" in {
     val eventStorage = new EventStorage
     val statistics = new Statistics
-    eventStorage.saveEvent(Event(DateTime.now().getMillis, 42, EventType.CLICK))
+    eventStorage.saveEvent(Event(DateTime.now(DateTimeZone.UTC).getMillis, 42, EventType.CLICK))
 
-    val result = statistics.getStatistic(DateTime.now())
+    val result = statistics.getStatistic(DateTime.now(DateTimeZone.UTC))
     result.uniqueUsers.get shouldBe 1
   }
   "save event" should "update cache and push to persistent storage" in {
