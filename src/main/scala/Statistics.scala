@@ -20,7 +20,10 @@ class Statistics extends Dependencies {
   def getStatistic(dateTime: DateTime) :Statistic = {
     if (AnalyticsTiming.isCurrentHour(dateTime))
       getCachedStatistic(dateTime)
-    else Statistic.tupled(eventPersistence.loadHourlyStatistic(dateTime))
+    else {
+      val r = eventPersistence.loadHourlyStatistic(dateTime)
+      Statistic.tupled(r)
+    }
   }
 
   def getCachedStatistic(dateTime: DateTime) :Statistic = {

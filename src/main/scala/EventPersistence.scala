@@ -2,21 +2,29 @@ import java.sql.DriverManager
 
 import org.joda.time.DateTime
 
+object EventPersistence{
+  def clear() ={
+    Class.forName("org.h2.Driver")
+    val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
+    try {
+      connection.prepareStatement("drop table if exists event").execute()
+      connection.prepareStatement(
+        "create table " +
+          "     event (" +
+          "        id bigint auto_increment, " +
+          "    userid bigint, " +
+          " timestamp bigint, " +
+          " eventtype varchar(25), " +
+          "   primary key(id)" +
+          "           )").execute()
+    } finally {
+      connection.close()
+    }
+  }
+}
 class EventPersistence {
-  Class.forName("org.h2.Driver")
-  val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
-  connection.prepareStatement("drop table event").execute()
-  connection.prepareStatement(
-    "create table " +
-      "     event (" +
-      "        id bigint auto_increment, " +
-      "    userid bigint, " +
-      " timestamp bigint, " +
-      " eventtype varchar(25), " +
-      "   primary key(id)" +
-      "           )").execute()
 
-  connection.close()
+  EventPersistence.clear()
 
   def save(event: Event) = {
     val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
@@ -34,6 +42,45 @@ class EventPersistence {
     }
   }
   def loadHourlyStatistic(dateTime: DateTime) :(Option[Long],Option[Long],Option[Long]) = {
-    (Some(0L),Some(0),Some(0))
+    val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
+    try {
+      val startOfHour = dateTime.hourOfDay.roundFloorCopy.getMillis
+      val endOfHour = dateTime.hourOfDay.roundCeilingCopy.getMillis
+
+      val saveStatement = connection.prepareStatement(
+        "select " +
+          "(select count(distinct userid) " +
+          "   from event" +
+          "  where timestamp >= ? " +
+          "    and timestamp <= ?) as uniqueUsers," +
+          "(select count(*) " +
+          "   from event" +
+          "  where eventtype='click'" +
+          "    and timestamp >= ? " +
+          "    and timestamp <= ?) as clicks," +
+          "(select count(*)" +
+          "   from event" +
+          "  where eventtype='impression'" +
+          "    and timestamp >= ?" +
+          "    and timestamp <= ?) as impressions")
+
+      for (i <- 1 to 3) {
+        saveStatement.setLong((i * 2) - 1, startOfHour)
+        saveStatement.setLong(i * 2, endOfHour)
+      }
+
+      val result = saveStatement.executeQuery()
+      result.next()
+      (Some(result.getLong("uniqueUsers")),
+        Some(result.getLong("clicks")),
+        Some(result.getLong("impressions")))
+    }catch{
+      case t: Throwable => {
+        t.printStackTrace()
+        (None,None,None)
+      }
+    }finally{
+      connection.close()
+    }
   }
 }

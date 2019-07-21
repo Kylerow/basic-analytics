@@ -24,9 +24,10 @@ class Server extends HttpApp with Dependencies{
         }
       }
     } ~
-    path("admin" / "clear-cache"){
+    path("admin" / "clear-data"){
       put{
         statisticsStorage.clear()
+        EventPersistence.clear()
         complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
       }
     } ~
