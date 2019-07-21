@@ -115,18 +115,37 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     httpclient.execute(clearCacheUri)
 
     val timestamp = (DateTime.now(DateTimeZone.UTC).getMillis) - (1000*60*60)
+    val currentTimestamp = DateTime.now(DateTimeZone.UTC).getMillis
     val user = "5"
     val event = "impression"
 
     val hour = AnalyticsTiming.getHour
     httpclient.execute(postUri(timestamp,user,event))
     httpclient.execute(postUri(timestamp+1,user,event))
-    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
+    val resultValue = result(httpclient.execute(getUri(currentTimestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
     resultValue.split('\n')(2).split(',')(1) shouldBe "0"
     httpclient.close()
   }
+
+//  it should "increment the previous hour stat, if entered for previous hour" in {
+//    val httpclient = HttpClients.createDefault
+//    httpclient.execute(clearCacheUri)
+//
+//    val timestamp = (DateTime.now(DateTimeZone.UTC).getMillis) - (1000*60*60)
+//    val user = "5"
+//    val event = "impression"
+//
+//    val hour = AnalyticsTiming.getHour
+//    httpclient.execute(postUri(timestamp,user,event))
+//    httpclient.execute(postUri(timestamp+1,user,event))
+//    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
+//
+//    hour shouldBe AnalyticsTiming.getHour
+//    resultValue.split('\n')(2).split(',')(1) shouldBe "2"
+//    httpclient.close()
+//  }
 
   it should "not affect the current statistics once the hour changes" in {
     val httpclient = HttpClients.createDefault
@@ -148,9 +167,6 @@ class AnalyticsSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resultValue2.split('\n')(0).split(',')(1) shouldBe "0"
     httpclient.close()
   }
-
-
-  /// TODO after current hour, start with long term - which don't disappear
 
   /// TODO validation for POST
   ///       * error for unknown event
