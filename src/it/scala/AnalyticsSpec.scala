@@ -92,6 +92,4 @@ class AnalyticsSpec extends AnalyticsIntegrationTest{
     postResult.getStatusLine.getStatusCode shouldBe 400
     httpclient.close()
   }
-
-  /// TODO scale
 }

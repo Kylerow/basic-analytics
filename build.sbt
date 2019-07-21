@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   version := "0.1",
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.8",
   organization := "advanced-software-insights",
   name := "basic-analytics"
 )
@@ -18,5 +18,8 @@ lazy val root = (project in file("."))
     libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.11",
     libraryDependencies += "joda-time" % "joda-time" % "2.10.3",
     libraryDependencies += "com.h2database" % "h2" % "1.4.199",
+    libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.1.3",
+    libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.1.3",
+      testFrameworks += new TestFramework("io.gatling.GatlingFramework"),
     IntegrationTest / parallelExecution := false
   )
