@@ -15,7 +15,7 @@ class CachedSpec  extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(0).split(',')(1) shouldBe "1"
+    resultValue.content.split('\n')(0).split(',')(1) shouldBe "1"
     httpclient.close()
   }
   it should "increment to two unique users if one exists" in  {
@@ -33,7 +33,7 @@ class CachedSpec  extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(0).split(',')(1) shouldBe "2"
+    resultValue.content.split('\n')(0).split(',')(1) shouldBe "2"
     httpclient.close()
   }
 
@@ -52,7 +52,7 @@ class CachedSpec  extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(0).split(',')(1) shouldBe "1"
+    resultValue.content.split('\n')(0).split(',')(1) shouldBe "1"
     httpclient.close()
 
   }
@@ -70,7 +70,7 @@ class CachedSpec  extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(1).split(',')(1) shouldBe "2"
+    resultValue.content.split('\n')(1).split(',')(1) shouldBe "2"
     httpclient.close()
   }
   it should "increment impressions" in {
@@ -87,7 +87,7 @@ class CachedSpec  extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(2).split(',')(1) shouldBe "2"
+    resultValue.content.split('\n')(2).split(',')(1) shouldBe "2"
     httpclient.close()
   }
   it should "not affect the current statistics once the hour changes" in {
@@ -102,12 +102,12 @@ class CachedSpec  extends AnalyticsIntegrationTest{
     httpclient.execute(postUri(timestamp,user,event))
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(0).split(',')(1) shouldBe "1"
+    resultValue.content.split('\n')(0).split(',')(1) shouldBe "1"
 
     httpclient.execute(hourPlusOneUri)
 
     val resultValue2 = result(httpclient.execute(getUri(timestamp+(1000*60*60))))(0)
-    resultValue2.split('\n')(0).split(',')(1) shouldBe "0"
+    resultValue2.content.split('\n')(0).split(',')(1) shouldBe "0"
     httpclient.close()
   }
 }

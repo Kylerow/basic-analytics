@@ -13,12 +13,13 @@ class AnalyticsSpec extends AnalyticsIntegrationTest{
     val event = "impression"
 
     val hour = AnalyticsTiming.getHour
-    httpclient.execute(postUri(timestamp,user,event))
+    val postResult = httpclient.execute(postUri(timestamp,user,event))
     httpclient.execute(postUri(timestamp+1,user,event))
     val resultValue = result(httpclient.execute(getUri(currentTimestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(2).split(',')(1) shouldBe "0"
+    postResult.getStatusLine.getStatusCode shouldBe 204
+    resultValue.content.split('\n')(2).split(',')(1) shouldBe "0"
     httpclient.close()
   }
 
@@ -31,12 +32,13 @@ class AnalyticsSpec extends AnalyticsIntegrationTest{
     val event = "impression"
 
     val hour = AnalyticsTiming.getHour
-    httpclient.execute(postUri(timestamp,user,event))
+    val postResult = httpclient.execute(postUri(timestamp,user,event))
     httpclient.execute(postUri(timestamp+1,user,event))
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(2).split(',')(1) shouldBe "2"
+    postResult.getStatusLine.getStatusCode shouldBe 204
+    resultValue.content.split('\n')(2).split(',')(1) shouldBe "2"
     httpclient.close()
   }
   it should "increment the two hour ago stat (clicks), if entered for two hours ago" in {
@@ -53,7 +55,7 @@ class AnalyticsSpec extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(1).split(',')(1) shouldBe "2"
+    resultValue.content.split('\n')(1).split(',')(1) shouldBe "2"
     httpclient.close()
   }
   it should "increment the two hour ago stat (unique users), if entered for two hours ago" in {
@@ -70,21 +72,27 @@ class AnalyticsSpec extends AnalyticsIntegrationTest{
     val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
     hour shouldBe AnalyticsTiming.getHour
-    resultValue.split('\n')(0).split(',')(1) shouldBe "1"
+    resultValue.content.split('\n')(0).split(',')(1) shouldBe "1"
     httpclient.close()
   }
 
+  it should "give an error for an unknown event type" in {
+    val httpclient = HttpClients.createDefault
+    httpclient.execute(clearDataUri)
 
-  /// TODO validation for POST
-  ///       * error for unknown event
+    val timestamp = (DateTime.now(DateTimeZone.UTC).getMillis)
+    val user = "5"
+    val event = "scroll"
 
-  /// TODO validation for GET
-  ///       * correct data types
-  ///       * only checking for this hour
+    val hour = AnalyticsTiming.getHour
+    val postResult = httpclient.execute(postUri(timestamp,user,event))
+    val resultValue = result(httpclient.execute(getUri(timestamp)))(0)
 
-  /// TODO validate return codes
+    hour shouldBe AnalyticsTiming.getHour
+    postResult.getStatusLine.getStatusCode shouldBe 400
+    httpclient.close()
+  }
 
-  /// TODO unique users,clicks,impressions go from short term to long term
 
   /// TODO multithread / scale
 

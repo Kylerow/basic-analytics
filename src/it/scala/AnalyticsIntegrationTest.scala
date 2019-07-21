@@ -5,6 +5,8 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 import scala.concurrent.Future
 
+case class HttpResult(code: Int, content: String)
+
 object AnalyticsIntegrationTest{
   val embeddedServer =
     System.getProperty("analytics.server.embedded") match {
@@ -41,13 +43,15 @@ trait AnalyticsIntegrationTest
   def hourPlusOneUri: HttpUriRequest =
     new HttpPut("http://localhost:8080/admin/hour-plus-one")
 
-  def result (httpResponses: HttpResponse*) :List[String] = {
+  def result (httpResponses: HttpResponse*) :List[HttpResult] = {
     httpResponses.map {
       httpResponse =>
         val content = httpResponse.getEntity.getContent
         val bytes = Array.ofDim[Byte](content.available())
         content.read(bytes)
-        new String(bytes)
+        HttpResult(
+          httpResponse.getStatusLine.getStatusCode,
+          new String(bytes))
     }.toList
   }
 }

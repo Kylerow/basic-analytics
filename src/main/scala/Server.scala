@@ -1,7 +1,9 @@
+import java.util.NoSuchElementException
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.stream.ActorMaterializer
 
@@ -18,9 +20,15 @@ class Server extends HttpApp with Dependencies{
       } ~
       post {
         parameters('timestamp.as[String], 'user.as[String], 'event.as[String]) {
-          (timestamp, user, event) =>
-            eventStorage.saveEvent(Event(timestamp.toLong,user.toLong, EventType.withName(event)))
-            complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
+        (timestamp, user, event) =>
+          try {
+            val eventType = EventType.withName(event)
+            eventStorage.saveEvent(Event(timestamp.toLong,user.toLong, eventType))
+            complete(StatusCodes.NoContent)
+          } catch {
+            case _ :NoSuchElementException => complete(StatusCodes.BadRequest,"Invalid Event Type")
+            case _ :Throwable => complete(StatusCodes.InternalServerError ,"Server Error")
+          }
         }
       }
     } ~
@@ -28,13 +36,13 @@ class Server extends HttpApp with Dependencies{
       put{
         statisticsStorage.clear()
         EventPersistence.clear()
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
+        complete(StatusCodes.NoContent)
       }
     } ~
     path("admin" / "hour-plus-one"){
       put{
         AnalyticsTiming.setHourToPresentPlusOne()
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, ""))
+        complete(StatusCodes.NoContent)
       }
     }
 }

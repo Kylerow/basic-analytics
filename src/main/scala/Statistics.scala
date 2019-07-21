@@ -20,10 +20,8 @@ class Statistics extends Dependencies {
   def getStatistic(dateTime: DateTime) :Statistic = {
     if (AnalyticsTiming.isCurrentHour(dateTime))
       getCachedStatistic(dateTime)
-    else {
-      val r = eventPersistence.loadHourlyStatistic(dateTime)
-      Statistic.tupled(r)
-    }
+    else
+      Statistic.tupled(eventPersistence.loadHourlyStatistic(dateTime))
   }
 
   def getCachedStatistic(dateTime: DateTime) :Statistic = {
@@ -44,5 +42,6 @@ class Statistics extends Dependencies {
   val storageBucketName: Event=>String = {
     case Event(_, _, EventType.CLICK) => "clicks"
     case Event(_, _, EventType.IMPRESSION) => "impressions"
+    case _ => "unknowns"
   }
 }
