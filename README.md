@@ -27,10 +27,18 @@ sbt -Danalytics.server.embedded=true it:test
 
 This runs the suite against a web server started and managed by the test suite.  It's embedded so the developer doesn't have to bother with starting and stopping servers, and can debug through production code and integration test code side by side, with minimal ceremony.
 
+Note that the Performance Test is meant as a baseline, but is dependent on the specifics of the system used to run the tests, so may fail on occasion if the host is resource constrained.
+
 If you would like to run the integration/acceptance test suite against the standalone server running locally - enter the following: 
 
 ```
 sbt it:test
+```
+
+Additional performance test results will be located in:
+
+```
+{project}/performance
 ```
 
 ## Running as Independent Service
