@@ -41,6 +41,7 @@ class EventPersistence {
       connection.close()
     }
   }
+
   def loadHourlyStatistic(dateTime: DateTime) :(Option[Long],Option[Long],Option[Long]) = {
     val connection = DriverManager.getConnection("jdbc:h2:~/basic-analytics-data")
     try {

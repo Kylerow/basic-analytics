@@ -15,11 +15,13 @@ trait Dependencies {
 
   var _statisticsStorage :StatisticsStorage = null
   def statisticsStorage: StatisticsStorage = {
-    if (_statisticsStorage==null) {
-      _statisticsStorage = Singletons.getSingleton(classOf[StatisticsStorage])
-      if(_statisticsStorage==null) {
-        _statisticsStorage = new StatisticsStorage
-        Singletons.setSingleton(_statisticsStorage)
+    if (_statisticsStorage == null) {
+      synchronized {
+        _statisticsStorage = Singletons.getSingleton(classOf[StatisticsStorage])
+        if (_statisticsStorage == null) {
+          _statisticsStorage = new StatisticsStorage
+          Singletons.setSingleton(_statisticsStorage)
+        }
       }
     }
     _statisticsStorage
@@ -34,10 +36,12 @@ trait Dependencies {
   var _eventPersistence :EventPersistence = null
   def eventPersistence = {
     if (_eventPersistence == null) {
-      _eventPersistence = Singletons.getSingleton(classOf[EventPersistence])
-      if (_eventPersistence == null){
-        _eventPersistence = new EventPersistence
-        Singletons.setSingleton(_eventPersistence)
+      synchronized {
+        _eventPersistence = Singletons.getSingleton(classOf[EventPersistence])
+        if (_eventPersistence == null) {
+          _eventPersistence = new EventPersistence
+          Singletons.setSingleton(_eventPersistence)
+        }
       }
     }
     _eventPersistence

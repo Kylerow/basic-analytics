@@ -22,6 +22,7 @@ class ScaledSpecRunner extends AnalyticsIntegrationTest{
     Gatling.fromMap(props.build) shouldBe 0
   }
 }
+
 class ScaledSpec extends Simulation {
   val httpConf = http
     .baseUrl("http://localhost:8080/analytics")
