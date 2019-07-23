@@ -6,7 +6,7 @@ To build, test and operate this system, you should have the following installed 
 
 > Scala v2.12.8 (The scala programming language)
 
-> sbt 1.2.8 (Simple Build Tool - dependency management and building for scala)
+> sbt v1.2.8 (Simple Build Tool - dependency management and building for scala)
 
 
 ## Building & Testing
