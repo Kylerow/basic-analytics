@@ -40,3 +40,5 @@ To run this as a standalone service - simply enter the following command in the 
 ```
 sbt run
 ```
+
+Stop the server by pressing control-C.
