@@ -2,7 +2,7 @@
 A basic analytics service to track user engagement.
 
 ## Tooling
-To build, test and operate this system, you should have the following installed on your system:
+To build, test and operate this system, you should have the following installed:
 
 > Scala v2.12.8 (The scala programming language)
 
@@ -41,9 +41,9 @@ Additional performance test results will be located in:
 {project}/performance
 ```
 
-## Running as Independent Service
+## Standalone Execution
 
-To run this as a standalone service - simply enter the following command in the project root: 
+To run as a standalone service - simply enter the following command in the project root: 
 
 ```
 sbt run
