@@ -27,6 +27,12 @@ sbt -Danalytics.server.embedded=true it:test
 
 This runs the suite against a web server started and managed by the test suite.  It's embedded so the developer doesn't have to bother with starting and stopping servers, and can debug through production code and integration test code side by side, with minimal ceremony.
 
+If you would like to run the integration/acceptance test suite against the standalone server running locally - enter the following: 
+
+```
+sbt it:test
+```
+
 ## Running as Independent Service
 
 To run this as a standalone service - simply enter the following command in the project root: 
