@@ -1,3 +1,5 @@
+![Scala CI](https://github.com/Kylerow/basic-analytics/workflows/Scala%20CI/badge.svg)
+
 # BASIC ANALYTICS
 A basic analytics service to track user engagement.
 
